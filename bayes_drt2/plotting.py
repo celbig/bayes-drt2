@@ -519,7 +519,7 @@ def plot_distribution(df, inv, ax=None, distribution=None, tau_plot=None, plot_b
 		num_decades = tmax - tmin
 		tau_plot = np.logspace(tmin, tmax, int(20 * num_decades + 1))
 
-	F_pred = inv.predict_distribution(tau_plot, distribution, **predict_kw)
+	F_pred = inv.predict_distribution(tau=tau_plot, name=distribution, **predict_kw)
 
 	if normalize and area is not None:
 		raise ValueError('If normalize=True, area cannot be specified.')
@@ -556,8 +556,8 @@ def plot_distribution(df, inv, ax=None, distribution=None, tau_plot=None, plot_b
 
 	if plot_ci:
 		if inv.fit_type.find('bayes') >= 0:
-			F_lo = inv.predict_distribution(tau_plot, distribution, percentile=2.5, **predict_kw)
-			F_hi = inv.predict_distribution(tau_plot, distribution, percentile=97.5, **predict_kw)
+			F_lo = inv.predict_distribution(tau=tau_plot, name=distribution, percentile=2.5, **predict_kw)
+			F_hi = inv.predict_distribution(tau=tau_plot, name=distribution, percentile=97.5, **predict_kw)
 			if area is not None:
 				F_lo *= area
 				F_hi *= area

@@ -226,16 +226,16 @@ def construct_A(frequencies, part, tau=None, basis='gaussian', fit_inductance=Fa
             quad_limits = (-20, 20)
         #		  elif part=='imag':
         #			  y = np.arange(-5,5,0.1)
-        #			  c = [np.trapz(func(y,w_n,t_0),x=y) for w_n in omega]
-        #			  r = [np.trapz(func(y,w_0,t_m),x=y) for t_m in 1/omega]
+        #			  c = [np.trapezoid(func(y,w_n,t_0),x=y) for w_n in omega]
+        #			  r = [np.trapezoid(func(y,w_0,t_m),x=y) for t_m in 1/omega]
 
         if integrate_method == 'quad':
             c = [quad(func, quad_limits[0], quad_limits[1], args=(w_n, t_0, epsilon), epsabs=1e-4)[0] for w_n in omega]
             r = [quad(func, quad_limits[0], quad_limits[1], args=(w_0, t_m, epsilon), epsabs=1e-4)[0] for t_m in tau]
         elif integrate_method == 'trapz':
             y = np.linspace(-20, 20, 1000)
-            c = [np.trapz(func(y, w_n, t_0, epsilon), x=y) for w_n in omega]
-            r = [np.trapz(func(y, w_0, t_m, epsilon), x=y) for t_m in tau]
+            c = [np.trapezoid(func(y, w_n, t_0, epsilon), x=y) for w_n in omega]
+            r = [np.trapezoid(func(y, w_0, t_m, epsilon), x=y) for t_m in tau]
         if r[0] != c[0]:
             print(r[0], c[0])
             raise Exception('First entries of first row and column are not equal')
@@ -260,7 +260,7 @@ def construct_A(frequencies, part, tau=None, basis='gaussian', fit_inductance=Fa
                            in tau]
             elif integrate_method == 'trapz':
                 y = np.linspace(-20, 20, 1000)
-                A[n, :] = [np.trapz(func(y, w_n, t_m, epsilon), x=y) for t_m in tau]
+                A[n, :] = [np.trapezoid(func(y, w_n, t_m, epsilon), x=y) for t_m in tau]
 
     return A
 

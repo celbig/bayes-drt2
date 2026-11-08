@@ -4,7 +4,7 @@ with open("README.md", "r",encoding="utf8") as fh:
     long_description = fh.read()
 
 setup(name='bayes-drt2',
-	version='0.2',
+	version='0.2.1',
 	description='A Python package for hierarchical Bayesian inversion of electrochemical impedance data',
 	long_description=long_description,
     long_description_content_type="text/markdown",

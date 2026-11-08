@@ -1411,6 +1411,14 @@ class Inverter:
 			else:
 				init = self._get_init_from_ridge(frequencies, Z, mode, nonneg=nonneg, outliers=outliers,
 												 inductance_scale=inductance_scale, ridge_kw=ridge_kw)
+				# keep the initial coefficients strictly inside user-supplied per-coefficient bounds
+				if 'x_lb' in add_stan_data or 'x_ub' in add_stan_data:
+					lb = np.asarray(add_stan_data.get('x_lb', -np.inf), dtype=float)
+					ub = np.asarray(add_stan_data.get('x_ub', np.inf), dtype=float)
+					# margin relative to the bound range: starting on a bound saturates Stan's
+					# logistic transform and flattens the gradient
+					margin = 1e-4 * np.where(np.isfinite(ub - lb), ub - lb, 0.0) + 1e-10
+					init['x'] = np.clip(init['x'], lb + margin, ub - margin)
 				self._init_params = init
 		else:
 			init = None
@@ -3739,7 +3747,7 @@ class Inverter:
 			num_decades = tmax - tmin
 			eval_tau = np.logspace(tmin, tmax, int(10 * num_decades + 1))
 
-		F = self.predict_distribution(eval_tau, distribution, percentile, time)
+		F = self.predict_distribution(tau=eval_tau, name=distribution, percentile=percentile, time=time)
 
 		# Determine whether negative peaks need to be fitted
 		if np.min(F) >= 0:
@@ -3825,7 +3833,7 @@ class Inverter:
 			num_decades = tmax - tmin
 			eval_tau = np.logspace(tmin, tmax, int(10 * num_decades + 1))
 
-		F = self.predict_distribution(eval_tau, distribution, percentile, time)
+		F = self.predict_distribution(tau=eval_tau, name=distribution, percentile=percentile, time=time)
 
 		# Determine whether negative peaks need to be fitted
 		if np.min(F) >= 0:
@@ -3963,7 +3971,7 @@ class Inverter:
 			eval_tau = self.distributions[distribution]['tau']
 
 		# Get distribution and HN fit
-		F = self.predict_distribution(eval_tau, distribution, percentile, time)
+		F = self.predict_distribution(tau=eval_tau, name=distribution, percentile=percentile, time=time)
 		F_fit = pf.evaluate_fit_distribution(self.distribution_fits[distribution]['peak_params'], eval_tau)
 
 		# If no weights specified, use hybrid weighting scheme

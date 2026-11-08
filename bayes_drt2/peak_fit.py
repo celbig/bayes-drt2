@@ -162,7 +162,7 @@ def fit_pos_peaks(tau, gamma, Rp, weights=None, check_shoulders=False, prom_rthr
         width = properties['widths'][i]
         start = int(peak - width)
         end = int(peak + width)
-        R = np.trapz(gamma[start:end], np.log(tau[start:end]))
+        R = np.trapezoid(gamma[start:end], np.log(tau[start:end]))
         t0 = tau[peak]
         alpha = 0.99  # 1 is symmetric
         beta = 0.8  # may be able to estimate from width
@@ -242,7 +242,7 @@ def fit_pos_peaks(tau, gamma, Rp, weights=None, check_shoulders=False, prom_rthr
                 width = new_peak_widths[i]
                 start = int(peak - width)
                 end = int(peak + width)
-                R = np.trapz((gamma - gamma_fit)[start:end], np.log(tau[start:end]))
+                R = np.trapezoid((gamma - gamma_fit)[start:end], np.log(tau[start:end]))
                 if R <= 0:
                     R = gamma[peak]
                 t0 = tau[peak]
@@ -278,7 +278,7 @@ def fit_pos_peaks(tau, gamma, Rp, weights=None, check_shoulders=False, prom_rthr
             # initialize new peak at largest misfit
             gamma_fit = evaluate_fit_distribution(x_filter, tau)
             peak = np.argmax(gamma - gamma_fit)
-            R = np.trapz((gamma - gamma_fit), np.log(tau))
+            R = np.trapezoid((gamma - gamma_fit), np.log(tau))
             if R <= 0:
                 R = gamma[peak]
             t0 = tau[peak]
@@ -416,7 +416,7 @@ def constrained_peak_fit(tau, gamma, tau0_guess, Rp, nonneg, lntau_uncertainty=3
         peak_width = 4  # peak width in ln_tau space
         start = np.argmin(np.abs(tau - (tau0_guess[n] * np.exp(-peak_width / 2))))
         end = np.argmin(np.abs(tau - (tau0_guess[n] * np.exp(peak_width / 2))))
-        R = np.trapz(gamma[start:end], np.log(tau[start:end]))
+        R = np.trapezoid(gamma[start:end], np.log(tau[start:end]))
         t0 = tau0_guess[n]
         alpha = 0.99
         beta = 0.8
